@@ -1,0 +1,2 @@
+# Smartaid
+a symptom checker
