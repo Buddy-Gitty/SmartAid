@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartAid - Chatbot Demo</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header>
+    <nav class="container">
+        <div class="logo">SmartAid</div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('demo') }}">Chat Bot</a></li>
+            <li><a href="#contact">Contact</a></li>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                {% if current_user.profile_pic %}
+                <img src="{{ url_for('static', filename='profile_pics/' + current_user.profile_pic) }}" class="profile-photo">
+                {% else %}
+                <img src="{{ url_for('static', filename='profile_pics/default.png') }}" class="profile-photo">
+                {% endif %}
+            {% else %}
+            <li><a href="{{ url_for('login') }}">Login</a></li>
+            {% endif %}        
+        </ul>
+    </nav>
+</header>
+
+<section class="demo">
+    <div class="container">
+        <h2>SmartAid Chatbot</h2>
+
+        <div class="demo-container" id="chat-box">
+            <!-- Chat messages appear here -->
+        </div>
+
+        <form id="chat-form">
+            <input type="text" id="user-input" placeholder="Describe your symptoms..." autocomplete="off">
+            <button type="submit" id="send-btn">Send</button>
+        </form>
+    </div>
+</section>
+
+<footer id="contact">
+    <div class="container">
+        <h4>Contact</h4>
+        <p>support@smartaid.com<br>1-800-SMART-AID</p>
+        <p>&copy; 2025 SmartAid. All rights reserved.</p>
+    </div>
+</footer>
+
+<script>
+const chatForm = document.getElementById('chat-form');
+const userInput = document.getElementById('user-input');
+const chatBox = document.getElementById('chat-box');
+
+chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const message = userInput.value.trim();
+    if (!message) return;
+
+    // Show user message
+    const userDiv = document.createElement('div');
+    userDiv.className = 'chat-message user';
+    userDiv.textContent = message;
+    chatBox.appendChild(userDiv);
+
+    userInput.value = '';
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // Send to backend
+    try {
+        const response = await fetch('/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message })
+        });
+        const data = await response.json();
+
+        // Show bot reply
+        const botDiv = document.createElement('div');
+        botDiv.className = 'chat-message bot';
+        botDiv.textContent = data.reply;
+        chatBox.appendChild(botDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    } catch (error) {
+        const botDiv = document.createElement('div');
+        botDiv.className = 'chat-message bot';
+        botDiv.textContent = "❌ Something went wrong. Please try again.";
+        chatBox.appendChild(botDiv);
+    }
+});
+</script>
+
+</body>
+</html>
