@@ -10,7 +10,8 @@ from werkzeug.utils import secure_filename
 # Create the app and configure it
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "1234567890abcdef")
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Mysql123#@localhost:3306/smartaid'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///smartaid.db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Mysql123#@localhost:3306/smartaid'
 
 # Folder to store uploaded files
 UPLOAD_FOLDER = os.path.join('static', 'uploads')
@@ -223,4 +224,5 @@ if __name__ == "__main__":
     # Create database tables if they don't exist
     with app.app_context():
         db.create_all()
+
     app.run(debug=True)
